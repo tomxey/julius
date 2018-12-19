@@ -2,7 +2,7 @@
 # Contributor: Matt Harrison <matt at mistbyte dot com>
 # Contributor: Muhammad Qadri <Muhammad dot A dot Qadri at gmail dot com>
 
-pkgname=julius
+pkgname=tomxey-julius
 pkgver=4.4.2.1
 pkgrel=3
 pkgdesc="A high-performance, two-pass large vocabulary continuous speech recognition decoder software"
@@ -11,6 +11,8 @@ url="http://julius.sourceforge.jp/"
 license=("custom")
 depends=("libpulse" "sdl2")
 optdepends=("voxforge-am-julius: acoustic models")
+provides=("julius")
+conflicts=("julius")
 source=("configure.patch"
         "tomxey-julius-repo.tar.gz")
 md5sums=("SKIP" "SKIP")
