@@ -24,6 +24,7 @@
  */
 
 #include "app.h"
+#include "user_lm.h"
 
 boolean separate_score_flag = FALSE;
 boolean outfile_enabled = FALSE;
@@ -69,7 +70,7 @@ opt_outfile(Jconf *jconf, char *arg[], int argnum)
   outfile_enabled = TRUE;
   return TRUE;
 }
-   
+
 /**********************************************************************/
 int
 main(int argc, char *argv[])
@@ -143,15 +144,15 @@ main(int argc, char *argv[])
     return -1;
   }
   
-#ifdef USER_LM_TEST
   {
     PROCESS_LM *lm;
     for(lm=recog->lmlist;lm;lm=lm->next) {
       if (lm->lmtype == LM_PROB) {
+  init_user_lms();
 	j_regist_user_lm_func(lm, my_uni, my_bi, my_lm);
       }
     }
-#endif
+  }
 
   /* checkout for recognition: build lexicon tree, allocate cache */
   if (j_final_fusion(recog) == FALSE) {
