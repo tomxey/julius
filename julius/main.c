@@ -104,6 +104,9 @@ main(int argc, char *argv[])
   j_add_option("-help", 0, 0, "display this help", opt_help);
   j_add_option("--help", 0, 0, "display this help", opt_help);
 
+  j_add_option("-user-lm-py", 1, 1, "path to user_lm.py", opt_user_lm_py_location);
+
+
   /* create a configuration variables container */
   jconf = j_jconf_new();
   // j_config_load_file(jconf, jconffile);
