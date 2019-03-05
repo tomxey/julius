@@ -1,4 +1,4 @@
 #!/usr/bin/bash
 shopt -s extglob
-rm tomxey-julius-repo.tar.gz
-tar caf tomxey-julius-repo.tar.gz ../!(arch-pkgbuild)
+rm python-julius-repo.tar.gz
+tar caf python-julius-repo.tar.gz ../!(arch-pkgbuild)
