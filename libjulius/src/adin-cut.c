@@ -2,45 +2,45 @@
  * @file   adin-cut.c
  *
  * <JA>
- * @brief  ��������ץ��㤪���ͭ����ָ���
+ * @brief  音声キャプチャおよび有音区間検出
  *
- * �������ϥǥХ�������β����ǡ����μ����ߡ������
- * ����¸�ߤ����֤θ��Ф�Ԥʤ��ޤ�. 
+ * 音声入力デバイスからの音声データの取り込み，および
+ * 音の存在する区間の検出を行ないます. 
  *
- * ͭ����֤θ��Фϡ�������٥�����򺹿����Ѥ��ƹԤʤ��ޤ�. 
- * �������Ҥ��Ȥˡ���٥뤷�����ͤ�ۤ��뿶���ˤĤ������򺹿��򥫥���Ȥ���
- * ���줬���ꤷ�����ʾ�ˤʤ�С����ζ�ֳ��ϸ��ФȤ���
- * �����ߤ򳫻Ϥ��ޤ�. ������������򺹿���������ʲ��ˤʤ�С�
- * �����ߤ���ߤ��ޤ�. �ºݤˤϴ����ڤ�Ф���Ԥʤ����ᡤ��������
- * �����������˥ޡ��������������ڤ�Ф��ޤ�. 
+ * 有音区間の検出は，振幅レベルと零交差数を用いて行ないます. 
+ * 入力断片ごとに，レベルしきい値を越える振幅について零交差数をカウントし，
+ * それが指定した数以上になれば，音の区間開始検出として
+ * 取り込みを開始します. 取り込み中に零交差数が指定数以下になれば，
+ * 取り込みを停止します. 実際には頑健に切り出しを行なうため，開始部と
+ * 停止部の前後にマージンを持たせて切り出します. 
  * 
- * �ޤ������ץ������� (-zmean)�ˤ�� DC offset �ν���򤳤��ǹԤʤ��ޤ�. 
- * offset �Ϻǽ�� @a ZMEANSAMPLES �ĤΥ���ץ��ʿ�Ѥ���׻�����ޤ�. 
+ * また，オプション指定 (-zmean)により DC offset の除去をここで行ないます. 
+ * offset は最初の @a ZMEANSAMPLES 個のサンプルの平均から計算されます. 
  *
- * �����ǡ����μ����ߤ��¹Ԥ������ϲ����ν�����Ԥʤ��ޤ�. ���Τ��ᡤ
- * ������������ǡ����Ϥ��μ�����ñ�̡�live���ϤǤϰ�����֡������ե�����
- * �ǤϥХåե��������ˤ��Ȥˡ�����������Ȥ��ƥ�����Хå��ؿ����ƤФ�ޤ�. 
- * ���Υ�����Хå��ؿ��Ȥ��ƥǡ�������¸����ħ����С�
- * �ʥե졼��Ʊ���Ρ�ǧ��������ʤ��ؿ�����ꤷ�ޤ�. 
+ * 音声データの取り込みと並行して入力音声の処理を行ないます. このため，
+ * 取り込んだ音声データはその取り込み単位（live入力では一定時間，音声ファイル
+ * ではバッファサイズ）ごとに，それらを引数としてコールバック関数が呼ばれます. 
+ * このコールバック関数としてデータの保存や特徴量抽出，
+ * （フレーム同期の）認識処理を進める関数を指定します. 
  *
- * �ޥ������Ϥ� NetAudio ���Ϥʤɤ� Live ���ϤǤϡ�
- * ������Хå���ν������Ť����������Ϥ�®�٤��ɤ��դ��ʤ��ȡ�
- * �ǥХ����ΥХåե�����졤�������Ҥ������Ȥ����礬����ޤ�. 
- * ���Υ��顼���ɤ����ᡤ�¹ԴĶ��� pthread �����Ѳ�ǽ�Ǥ����硤
- * ���������ߡ���ָ����������Τ���Ω��������åɤ�ư��ޤ�. 
- * ���ξ�硤���Υ���åɤ��ܥ���åɤȥХåե� @a speech ��𤷤�
- * �ʲ��Τ褦�˶�Ĵư��ޤ�. 
+ * マイク入力や NetAudio 入力などの Live 入力では，
+ * コールバック内の処理が重く処理が入力の速度に追い付かないと，
+ * デバイスのバッファが溢れ，入力断片がロストする場合があります. 
+ * このエラーを防ぐため，実行環境で pthread が使用可能である場合，
+ * 音声取り込み・区間検出部は本体と独立したスレッドで動作します. 
+ * この場合，このスレッドは本スレッドとバッファ @a speech を介して
+ * 以下のように協調動作します. 
  * 
- *    - Thread 1: ���������ߡ�����ָ��Х���å�
- *        - �ǥХ������鲻���ǡ������ɤ߹��ߤʤ��鲻��ָ��Ф�Ԥʤ�. 
- *          ���Ф�������֤Υ���ץ�ϥХåե� @a speech ���������༡
- *          �ɲä����. 
- *        - ���Υ���åɤϵ�ư�������ܥ���åɤ�����Ω����ư���
- *          �嵭��ư���Ԥʤ�³����. 
- *    - Thread 2: ����������ǧ��������Ԥʤ��ܥ���å�
- *        - �Хåե� @a speech �������֤��Ȥ˴ƻ뤷�������ʥ���ץ뤬
- *          Thread 1 �ˤ�ä��ɲä��줿�餽�������������������λ����
- *          ʬ�Хåե���ͤ��. 
+ *    - Thread 1: 音声取り込み・音区間検出スレッド
+ *        - デバイスから音声データを読み込みながら音区間検出を行なう. 
+ *          検出した音区間のサンプルはバッファ @a speech の末尾に逐次
+ *          追加される. 
+ *        - このスレッドは起動時から本スレッドから独立して動作し，
+ *          上記の動作を行ない続ける. 
+ *    - Thread 2: 音声処理・認識処理を行なう本スレッド
+ *        - バッファ @a speech を一定時間ごとに監視し，新たなサンプルが
+ *          Thread 1 によって追加されたらそれらを処理し，処理が終了した
+ *          分バッファを詰める. 
  *
  * </JA>
  * <EN>
@@ -110,6 +110,10 @@
 #include <pthread.h>
 #endif
 
+#ifdef HAVE_LIBFVAD
+#include "../libfvad/libfvad/include/fvad.h"
+#endif /* HAVE_LIBFVAD */
+
 /// Define this if you want to output a debug message for threading
 #undef THREAD_DEBUG
 /// Enable some fixes relating adinnet+module
@@ -123,9 +127,9 @@
  * 
  * </EN>
  * <JA>
- * @brief  �����ڤ�Ф��ѳƼ�ѥ�᡼���򥻥å�
+ * @brief  音声切り出し用各種パラメータをセット
  *
- * ����򸵤��ڤ�Ф��ѤΥѥ�᡼����׻�����������ꥢ�˥��åȤ��ޤ�. 
+ * 設定を元に切り出し用のパラメータを計算し，ワークエリアにセットします. 
  * 
  * </JA>
  * @param adin [in] AD-in work area
@@ -139,6 +143,9 @@ adin_setup_param(ADIn *adin, Jconf *jconf)
 {
   float samples_in_msec;
   int freq;
+#ifdef HAVE_LIBFVAD
+  int i;
+#endif /* HAVE_LIBFVAD */
 
   if (jconf->input.sfreq <= 0) {
     jlog("ERROR: adin_setup_param: going to set smpfreq to %d\n", jconf->input.sfreq);
@@ -205,6 +212,27 @@ adin_setup_param(ADIn *adin, Jconf *jconf)
 
   adin->rehash = FALSE;
 
+#ifdef HAVE_LIBFVAD
+  if (jconf->detect.fvad_mode < 0) {
+    adin->fvad = NULL;
+  } else {
+    /* initialize libfvad */
+    adin->fvad = fvad_new();
+    adin->fvad_lastresultnum = jconf->detect.fvad_smoothnum;
+    adin->fvad_thres = jconf->detect.fvad_thres;
+    /* set up parameters */
+    fvad_set_sample_rate(adin->fvad, jconf->input.sfreq);
+    fvad_set_mode(adin->fvad, jconf->detect.fvad_mode);
+    adin->fvad_frameshiftinms = 10;
+    /* clean up working area */
+    adin->fvad_speechlen = 0;
+    adin->fvad_framesize = jconf->input.sfreq * adin->fvad_frameshiftinms / 1000;
+    adin->fvad_lastresult = (int *)mymalloc(sizeof(int) * adin->fvad_lastresultnum);
+    for (i = 0; i < adin->fvad_lastresultnum; i++) adin->fvad_lastresult[i] = 0;
+    adin->fvad_lastp = 0;
+  }
+#endif /* HAVE_LIBFVAD */
+
   return TRUE;
 
 }
@@ -214,7 +242,7 @@ adin_setup_param(ADIn *adin, Jconf *jconf)
  * Purge samples already processed in the temporary buffer.
  * </EN>
  * <JA>
- * �ƥ�ݥ��Хåե��ˤ���������줿����ץ��ѡ�������.
+ * テンポラリバッファにある処理されたサンプルをパージする.
  * </JA>
  * 
  * @param a [in] AD-in work area
@@ -229,6 +257,59 @@ adin_purge(ADIn *a, int from)
   }
   a->bp = a->current_len - from;
 }
+
+#ifdef HAVE_LIBFVAD
+/* proceed libfvad detection: return 1 for speech part, 0 for non-speech part */
+static int
+fvad_proceed(ADIn *a, SP16 *speech, int samplenum)
+{
+  int i, j, k;
+  int ret, result;
+  float sum;
+
+  if (a->fvad == NULL) return 1;
+
+  if (a->fvad_speechlen + samplenum > MAXSPEECHLEN) {
+    /* buffer overflow */
+    samplenum = MAXSPEECHLEN - a->fvad_speechlen;
+  }
+  /* append incoming samples to libfvad buffer */
+  for (i = 0; i < samplenum; i++) {
+    a->fvad_speech[a->fvad_speechlen + i] = speech[i];
+  }
+  a->fvad_speechlen += samplenum;
+  /* process per 10ms block till buffered end */
+  for (i = 0; i + a->fvad_framesize < a->fvad_speechlen; i += a->fvad_framesize) {
+    ret = fvad_process(a->fvad, &(a->fvad_speech[i]), a->fvad_framesize);
+    if (ret < 0) {
+      /* error */
+      jlog("ERROR: fvad_proceed: internal error occured at fvad_process()\n");
+      break;
+    }
+    a->fvad_lastresult[a->fvad_lastp] = ret;
+    if (++a->fvad_lastp >= a->fvad_lastresultnum) a->fvad_lastp -= a->fvad_lastresultnum;
+  }
+  /* get smoothed result from last 5 ticks */
+  sum = 0.0f;
+  for (j = 0; j < a->fvad_lastresultnum; j++) sum += (float)a->fvad_lastresult[j];
+  sum /= (float)a->fvad_lastresultnum;
+  /* judge */
+  if (sum >= a->fvad_thres)
+    result = 1;
+  else
+    result = 0;
+  
+  /* flush processed samples */
+  k = 0;
+  for (j = i; j < a->fvad_speechlen; j++) {
+    a->fvad_speech[k] = a->fvad_speech[j];
+    k++;
+  }
+  a->fvad_speechlen = k;
+  
+  return result;
+}
+#endif /* HAVE_LIBFVAD */
 
 /** 
  * <EN>
@@ -262,31 +343,31 @@ adin_purge(ADIn *a, int from)
  * 
  * </EN>
  * <JA>
- * @brief  �������ϤȲ����Ф�Ԥ��ᥤ��ؿ�
+ * @brief  音声入力と音検出を行うメイン関数
  *
- * �����Ǥϲ������Ϥμ����ߡ�����֤γ��ϡ���λ�θ��Ф�Ԥ��ޤ�. 
+ * ここでは音声入力の取り込み，音区間の開始・終了の検出を行います. 
  *
- * ����åɥ⡼�ɻ������δؿ�����Ω����AD-in����åɤȤ��ƥǥ��å�����ޤ�. 
- * (adin_thread_create()), �����Ϥ��Τ���Ȥ��δؿ��ϥ�����ꥢ���
- * speech[] �˥ȥꥬ��������ץ��Ͽ�������� transfer_online �� TRUE ��
- * ���åȤ��ޤ�. Julius �Υᥤ���������å� (adin_go()) ��
- * adin_thread_process() �˰ܹԤ��������� transfer_online ���� speech[] ��
- * ���Ȥ��ʤ���ǧ��������Ԥ��ޤ�. 
+ * スレッドモード時，この関数は独立したAD-inスレッドとしてデタッチされます. 
+ * (adin_thread_create()), 音入力を検知するとこの関数はワークエリア内の
+ * speech[] にトリガしたサンプルを記録し，かつ transfer_online を TRUE に
+ * セットします. Julius のメイン処理スレッド (adin_go()) は
+ * adin_thread_process() に移行し，そこで transfer_online 時に speech[] を
+ * 参照しながら認識処理を行います. 
  *
- * �󥹥�åɥ⡼�ɻ��ϡ��ᥤ������ؿ� adin_go() ��ľ�ܤ��δؿ���Ƥӡ�
- * ǧ�������Ϥ���������ľ�ܹԤ��ޤ�. 
+ * 非スレッドモード時は，メイン処理関数 adin_go() は直接この関数を呼び，
+ * 認識処理はこの内部で直接行われます. 
  *
- * ����åɥ⡼�ɤϥޥ������Ϥʤɡ����Ϥ�̵�¤ǽ������ٱ䤬�ǡ�����
- * ��ꤳ�ܤ��򾷤��褦�� live input ���Ѥ����ޤ�. �������ե���������
- * ��adinnet ���ϤΤ褦�� buffered input �Ǥ��󥹥�åɥ⡼�ɤ��Ѥ����ޤ�. 
+ * スレッドモードはマイク入力など，入力が無限で処理の遅延がデータの
+ * 取りこぼしを招くような live input で用いられます. 一方，ファイル入力
+ * やadinnet 入力のような buffered input では非スレッドモードが用いられます. 
  *
- * ������ ad_process �ϡ������������ץ���Ф��ƽ�����Ԥ��ؿ���
- * ���ꤷ�ޤ�. �ꥢ�륿����ǧ����Ԥ����ϡ���������1�ѥ���ǧ��������
- * �Ԥ��ؿ������ꤵ��ޤ�. �֤��ͤ� 1 �Ǥ���С����Ϥ򤳤��Ƕ��ڤ�ޤ�. 
- * -1 �Ǥ���Х��顼��λ���ޤ�. 
+ * 引数の ad_process は，取り込んだサンプルに対して処理を行う関数を
+ * 指定します. リアルタイム認識を行う場合は，ここに第1パスの認識処理を
+ * 行う関数が指定されます. 返り値が 1 であれば，入力をここで区切ります. 
+ * -1 であればエラー終了します. 
  * 
- * ������ ad_check �ϰ���������Ȥ˷����֤��ƤФ��ؿ�����ꤷ�ޤ�. ����
- * �ؿ����֤��ͤ� 0 �ʲ����ä���硤���Ϥ�¨�����Ǥ��ƴؿ���λ���ޤ�. 
+ * 引数の ad_check は一定処理ごとに繰り返し呼ばれる関数を指定します. この
+ * 関数の返り値が 0 以下だった場合，入力を即時中断して関数を終了します. 
  * </JA>
  *
  * @param ad_process [in] function to process triggerted input.
@@ -340,6 +421,13 @@ adin_cut(int (*ad_process)(SP16 *, int, Recog *), int (*ad_check)(Recog *), Reco
     a->nc = 0;
     a->sblen = 0;
     a->need_init = FALSE;		/* for next call */
+#ifdef HAVE_LIBFVAD
+    if (a->fvad) {
+      a->fvad_speechlen = 0;
+      for (i = 0; i < a->fvad_lastresultnum; i++) a->fvad_lastresult[i] = 0;
+      a->fvad_lastp = 0;
+    }
+#endif /* HAVE_LIBFVAD */
   }
 
   /****************/
@@ -568,7 +656,13 @@ adin_cut(int (*ad_process)(SP16 *, int, Recog *), int (*ad_check)(Recog *), Reco
 	/* return zero-cross num in the cycle buffer */
 	zc = count_zc_e(&(a->zc), &(a->buffer[i]), wstep);
 	
-	if (zc > a->noise_zerocross) { /* now triggering */
+	if (
+#ifdef HAVE_LIBFVAD
+	    /* trigger when both libfvad and julius VAD are triggered */
+	    /* process input in libfvad and get VAD result */
+	    fvad_proceed(a, &(a->buffer[i]), wstep) == 1 &&
+#endif /* HAVE_LIBFVAD */
+	    zc > a->noise_zerocross) { /* now triggering */
 	  
 	  if (a->is_valid_data == FALSE) {
 	    /*****************************************************/
@@ -925,7 +1019,7 @@ break_input:
  * Callback to store triggered samples within A/D-in thread.
  * </EN>
  * <JA>
- * A/D-in ����åɤˤƥȥꥬ�������ϥ���ץ����¸���륳����Хå�.
+ * A/D-in スレッドにてトリガした入力サンプルを保存するコールバック.
  * </JA>
  * 
  * @param now [in] triggered fragment
@@ -963,7 +1057,7 @@ adin_store_buffer(SP16 *now, int len, Recog *recog)
  * A/D-in thread main function.
  * </EN>
  * <JA>
- * A/D-in ����åɤΥᥤ��ؿ�.
+ * A/D-in スレッドのメイン関数.
  * </JA>
  * 
  * @param dummy [in] a dummy data, not used.
@@ -995,7 +1089,7 @@ adin_thread_input_main(void *dummy)
  * Start new A/D-in thread, and initialize buffer.
  * </EN>
  * <JA>
- * �Хåե����������� A/D-in ����åɤ򳫻Ϥ���. 
+ * バッファを初期化して A/D-in スレッドを開始する. 
  * </JA>
  * @param recog [in] engine instance
  *
@@ -1038,7 +1132,7 @@ adin_thread_create(Recog *recog)
  * Delete A/D-in thread
  * </EN>
  * <JA>
- * A/D-in ����åɤ�λ����
+ * A/D-in スレッドを終了する
  * </JA>
  * @param recog [in] engine instance
  *
@@ -1102,11 +1196,11 @@ adin_thread_cancel(Recog *recog)
  * and if found, process them.  The interface are the same as adin_cut().
  * </EN>
  * <JA>
- * @brief  ����åɥ⡼���ѥᥤ��ؿ�
+ * @brief  スレッドモード用メイン関数
  *
- * ���δؿ��� A/D-in ����åɤˤ�äƥ���ץ뤬��¸�����Τ��Ԥ���
- * ��¸���줿����ץ��缡�������Ƥ����ޤ�. �������֤��ͤ� adin_cut() ��
- * Ʊ��Ǥ�. 
+ * この関数は A/D-in スレッドによってサンプルが保存されるのを待ち，
+ * 保存されたサンプルを順次処理していきます. 引数や返り値は adin_cut() と
+ * 同一です. 
  * </JA>
  * 
  * @param ad_process [in] function to process triggerted input.
@@ -1262,11 +1356,11 @@ adin_thread_process(int (*ad_process)(SP16 *, int, Recog *), int (*ad_check)(Rec
  * segment from input device and process them concurrently by one process.
  * </EN>
  * <JA>
- * @brief  ���Ͻ�����Ԥ��ȥå״ؿ�
+ * @brief  入力処理を行うトップ関数
  *
- * ����åɥ⡼�ɤǤϡ����δؿ��� adin_thead_process() ��ƤӽФ���
- * �󥹥�åɥ⡼�ɤǤ� adin_cut() ��ľ�ܸƤӽФ�. �������֤��ͤ�
- * adin_cut() ��Ʊ��Ǥ���. 
+ * スレッドモードでは，この関数は adin_thead_process() を呼び出し，
+ * 非スレッドモードでは adin_cut() を直接呼び出す. 引数や返り値は
+ * adin_cut() と同一である. 
  * </JA>
  * 
  * @param ad_process [in] function to process triggerted input.
@@ -1300,7 +1394,7 @@ adin_go(int (*ad_process)(SP16 *, int, Recog *), int (*ad_check)(Recog *), Recog
  * Call device-specific initialization.
  * </EN>
  * <JA>
- * �ǥХ�����¸�ν�����ؿ���ƤӽФ�. 
+ * デバイス依存の初期化関数を呼び出す. 
  * </JA>
  * 
  * @param a [in] A/D-in work area
@@ -1325,7 +1419,7 @@ adin_standby(ADIn *a, int freq, void *arg)
  * Call device-specific function to begin capturing of the audio stream.
  * </EN>
  * <JA>
- * ���μ����ߤ򳫻Ϥ���ǥХ�����¸�δؿ���ƤӽФ�. 
+ * 音の取り込みを開始するデバイス依存の関数を呼び出す. 
  * </JA>
  * 
  * @param a [in] A/D-in work area
@@ -1354,7 +1448,7 @@ adin_begin(ADIn *a, char *file_or_dev_name)
  * Call device-specific function to end capturing of the audio stream.
  * </EN>
  * <JA>
- * ���μ����ߤ�λ����ǥХ�����¸�δؿ���ƤӽФ�. 
+ * 音の取り込みを終了するデバイス依存の関数を呼び出す. 
  * </JA>
  * 
  * @param a [in] A/D-in work area
@@ -1379,7 +1473,7 @@ adin_end(ADIn *a)
  * Free memories of A/D-in work area.
  * </EN>
  * <JA>
- * ���������ѥ�����ꥢ�Υ����������. 
+ * 音取り込み用ワークエリアのメモリを開放する. 
  * </JA>
  * 
  * @param recog [in] engine instance
@@ -1411,6 +1505,12 @@ adin_free_param(Recog *recog)
 #ifdef HAVE_PTHREAD
   if (a->speech) free(a->speech);
 #endif
+#ifdef HAVE_LIBFVAD
+  if (a->fvad) {
+    free(a->fvad_lastresult);
+    fvad_free(a->fvad);
+  }
+#endif /* HAVE_LIBFVAD */
 }
 
 /* end of file */

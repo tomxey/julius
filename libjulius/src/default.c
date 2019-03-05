@@ -2,9 +2,9 @@
  * @file   default.c
  * 
  * <JA>
- * @brief  ����Υǥե�����ͤΥ��å�
+ * @brief  設定のデフォルト値のセット
  *
- * �����ǽ�ʥѥ�᡼���ν���ͤ򥻥åȤ��ޤ�. 
+ * 設定可能なパラメータの初期値をセットします. 
  * </JA>
  * 
  * <EN>
@@ -31,13 +31,13 @@
 
 /** 
  * <JA>
- * @brief  �ѥ�᡼����¤�� Jconf �˽���ͤ���������. 
+ * @brief  パラメータ構造体 Jconf に初期値を代入する. 
  *
- * �������ͤ�����������Τϡ�Jconf ���Ȥ˳�Ǽ������ͤΤߤǤ���. 
- * ���̤ι�¤��AM, LM, SEARCH�ˤΥѥ�᡼���ϥ��åȤ��ʤ��Τǡ�
- * ���줾���̤δؿ��ǽ��������ɬ�פ�ͭ��. 
+ * ここで値が初期化されるのは，Jconf 自身に格納される値のみである. 
+ * 下位の構造（AM, LM, SEARCH）のパラメータはセットしないので，
+ * それぞれ別の関数で初期化する必要が有る. 
  * 
- * @param j [in] �ѥ�᡼����¤��
+ * @param j [in] パラメータ構造体
  * </JA>
  * <EN>
  * @brief   Fill in the system default values to a parameter structure Jconf.
@@ -83,6 +83,11 @@ jconf_set_default_values(Jconf *j)
   j->detect.gmm_uptrigger_thres		= 0.7;
   j->detect.gmm_downtrigger_thres	= -0.2;
 #endif
+#ifdef HAVE_LIBFVAD
+  j->detect.fvad_mode                   = -1;
+  j->detect.fvad_smoothnum              = 5;
+  j->detect.fvad_thres                  = 0.5;
+#endif /* HAVE_LIBFVAD */
 
   j->preprocess.strip_zero_sample	= TRUE;
   j->preprocess.use_zmean		= FALSE;
@@ -112,9 +117,9 @@ jconf_set_default_values(Jconf *j)
  * @param j [in] AM configuration parameter structure
  * </EN>
  * <JA>
- * AM�ѥ�᡼����¤�Τ˽���ͤ���������.
+ * AMパラメータ構造体に初期値を代入する.
  * 
- * @param j [in] AM�ѥ�᡼����¤��
+ * @param j [in] AMパラメータ構造体
  * </JA>
  * 
  *
@@ -180,9 +185,9 @@ jconf_set_default_values_am(JCONF_AM *j)
  * @param j [in] LM configuration parameter structure
  * </EN>
  * <JA>
- * LM�ѥ�᡼����¤�Τ˽���ͤ���������.
+ * LMパラメータ構造体に初期値を代入する.
  * 
- * @param j [in] LM�ѥ�᡼����¤��
+ * @param j [in] LMパラメータ構造体
  * </JA>
  *
  * @callgraph
@@ -227,9 +232,9 @@ jconf_set_default_values_lm(JCONF_LM *j)
  * @param j [in] search configuration parameter structure
  * </EN>
  * <JA>
- * õ��(SEARCH)�ѥ�᡼����¤�Τ˽���ͤ���������.
+ * 探索(SEARCH)パラメータ構造体に初期値を代入する.
  * 
- * @param j [in] õ���ѥ�᡼����¤��
+ * @param j [in] 探索パラメータ構造体
  * </JA>
  * 
  * @callgraph

@@ -2,10 +2,10 @@
  * @file   m_options.c
  * 
  * <JA>
- * @brief  еке╫е╖ечеє╜ш═¤
+ * @brief  уВкуГЧуВ╖уГзуГ│хЗжчРЖ
  *
- * д│д│д╦двды┤╪┐Їд╧бдjconfе╒ебедеыдкдшд╙е│е▐еєе╔ещедеєдлдщд╬еке╫е╖ечеє╗╪─ъдЄ
- * ╜чд╦╞╔д▀╣■д▀бд├═дЄ│╩╟╝д╣ды. 
+ * уБУуБУуБлуБВуВЛщЦвцХ░уБпя╝МjconfуГХуВбуВдуГлуБКуВИуБ│уВ│уГЮуГ│уГЙуГйуВдуГ│уБЛуВЙуБоуВкуГЧуВ╖уГзуГ│цМЗхоЪуВТ
+ * щаЖуБлшкнуБ┐ш╛╝уБ┐я╝МхАдуВТца╝ч┤НуБЩуВЛ. 
  * </JA>
  * 
  * <EN>
@@ -32,15 +32,15 @@
 
 /** 
  * <JA>
- * @brief  ┴ъ┬╨е╤е╣дЄе╒еые╤е╣д╦╩╤┤╣д╣ды. 
+ * @brief  чЫ╕хп╛уГСуВ╣уВТуГХуГлуГСуВ╣уБлхдЙцПЫуБЩуВЛ. 
  * 
- * е╒ебедеыд╬е╤е╣╠╛дм┴ъ┬╨е╤е╣д╟двдьд╨бделеьеєе╚е╟егеьепе╚еъдЄд─д▒д┐
- * е╒еые╤е╣д╦╩╤┤╣д╖д╞╩╓д╣. └ф┬╨е╤е╣д╟двдьд╨бдд╜д╬д▐д▐╩╓д╣. 
+ * уГХуВбуВдуГлуБоуГСуВ╣хРНуБМчЫ╕хп╛уГСуВ╣уБзуБВуВМуБ░я╝МуВлуГмуГ│уГИуГЗуВгуГмуВпуГИуГкуВТуБдуБСуБЯ
+ * уГХуГлуГСуВ╣уБлхдЙцПЫуБЧуБжш┐ФуБЩ. ч╡╢хп╛уГСуВ╣уБзуБВуВМуБ░я╝МуБЭуБоуБ╛уБ╛ш┐ФуБЩ. 
  * 
- * @param filename [in] е╒ебедеыд╬е╤е╣╠╛
- * @param dirname [in] елеьеєе╚е╟егеьепе╚еъд╬е╤е╣╠╛
+ * @param filename [in] уГХуВбуВдуГлуБоуГСуВ╣хРН
+ * @param dirname [in] уВлуГмуГ│уГИуГЗуВгуГмуВпуГИуГкуБоуГСуВ╣хРН
  * 
- * @return └ф┬╨е╤е╣╠╛д╬╞■д├д┐бд┐╖д┐д╦│фдъ╔╒д▒дщдьд┐е╨е├е╒еб
+ * @return ч╡╢хп╛уГСуВ╣хРНуБохЕеуБгуБЯя╝МцЦ░уБЯуБлхЙ▓уВКф╗ШуБСуВЙуВМуБЯуГРуГГуГХуВб
  * </JA>
  * <EN>
  * @brief  Change relative path to full path.
@@ -77,7 +77,7 @@ filepath(char *filename, char *dirname)
  * Returns next argument string.
  * </EN>
  * <JA>
- * ╝бд╬░·┐Їд╬╩╕╗·╬єдЄ╩╓д╣. 
+ * цмбуБох╝ХцХ░уБоцЦЗхнЧхИЧуВТш┐ФуБЩ. 
  * </JA>
  * 
  * @param cur [i/o] pointer to current point of the argment array
@@ -133,9 +133,9 @@ check_section(Jconf *jconf, char *optname, short sec)
 
 /** 
  * <JA>
- * есетеъ╬╬░шдЄ▓Є╩№д╖ NULL д╟╦фдсды. 
- * @param p [i/o] есетеъ╬╬░шд╬└ш╞мдЄ╗╪д╣е▌едеєе┐╩╤┐Їд╪д╬е▌едеєе┐
- * @note @a p дм NULL д╬╛ь╣чд╧▓┐дт╡пд│дщд╩ддбг
+ * уГбуГвуГкщаШхЯЯуВТшзгцФ╛уБЧ NULL уБзхЯЛуВБуВЛ. 
+ * @param p [i/o] уГбуГвуГкщаШхЯЯуБохЕИщануВТцМЗуБЩуГЭуВдуГ│уВ┐хдЙцХ░уБ╕уБоуГЭуВдуГ│уВ┐
+ * @note @a p уБМ NULL уБоха┤хРИуБпф╜ХуВВш╡╖уБУуВЙуБкуБДуАВ
  * </JA>
  * <EN>
  * Free memory and fill it with NULL.
@@ -148,12 +148,12 @@ check_section(Jconf *jconf, char *optname, short sec)
 
 /**
  * <JA>
- * еке╫е╖ечеє▓Є└╧.
+ * уВкуГЧуВ╖уГзуГ│шзгцЮР.
  *
- * @param argc [in] @a argv д╦┤▐д▐дьды░·┐Їд╬┐Ї
- * @param argv [in] ░·┐Ї├═б╩╩╕╗·╬єб╦д╬╟█╬є
- * @param cwd [in] елеьеєе╚е╟егеьепе╚еъ
- * @param jconf [out] ├═дЄ│╩╟╝д╣дыjconf╣╜┬д┬╬
+ * @param argc [in] @a argv уБлхРлуБ╛уВМуВЛх╝ХцХ░уБоцХ░
+ * @param argv [in] х╝ХцХ░хАдя╝ИцЦЗхнЧхИЧя╝ЙуБощЕНхИЧ
+ * @param cwd [in] уВлуГмуГ│уГИуГЗуВгуГмуВпуГИуГк
+ * @param jconf [out] хАдуВТца╝ч┤НуБЩуВЛjconfцзЛщАаф╜У
  * 
  * </JA>
  * <EN>
@@ -1345,6 +1345,20 @@ opt_parse(int argc, char *argv[], char *cwd, Jconf *jconf)
       }
       free(tmparg);
       continue;
+#ifdef HAVE_LIBFVAD
+    } else if (strmatch(argv[i],"-fvad")) { /* fvad switch */
+      if (!check_section(jconf, argv[i], JCONF_OPT_GLOBAL)) return FALSE;
+      GET_TMPARG;
+      jconf->detect.fvad_mode = atoi(tmparg);
+      continue;
+    } else if (strmatch(argv[i],"-fvad_param")) { /* set fvad parameter */
+      if (!check_section(jconf, argv[i], JCONF_OPT_GLOBAL)) return FALSE;
+      GET_TMPARG;
+      jconf->detect.fvad_smoothnum = atoi(tmparg);
+      GET_TMPARG;
+      jconf->detect.fvad_thres = (float)atof(tmparg);
+      continue;
+#endif /* HAVE_LIBFVAD */
     }
     if (argv[i][0] == '-' && strlen(argv[i]) == 2) {
       /* 1-letter options */
@@ -1491,7 +1505,7 @@ opt_parse(int argc, char *argv[], char *cwd, Jconf *jconf)
 
 /** 
  * <JA>
- * еке╫е╖ечеє┤╪╧вд╬есетеъ╬╬░шдЄ▓Є╩№д╣ды. 
+ * уВкуГЧуВ╖уГзуГ│щЦвщАгуБоуГбуГвуГкщаШхЯЯуВТшзгцФ╛уБЩуВЛ. 
  * </JA>
  * <EN>
  * Free memories of variables allocated by option arguments.

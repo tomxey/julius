@@ -2,21 +2,21 @@
  * @file   adin_mic_freebsd.c
  *
  * <JA>
- * @brief  �ޥ������� (FreeBSD)
+ * @brief  マイク入力 (FreeBSD)
  *
- * �ޥ������ϤΤ�������٥�ؿ��Ǥ���FreeBSD�Ǥ��Υե����뤬���Ѥ���ޤ���
+ * マイク入力のための低レベル関数です．FreeBSDでこのファイルが使用されます．
  *
- * ������ɥ����ɤ� 16bit ��Υ�� ��Ͽ���Ǥ��뤳�Ȥ�ɬ�ܤǤ���
+ * サウンドカードが 16bit モノラル で録音できることが必須です．
  * 
- * Julius��FreeBSD�ǥߥ������ǥХ������������ڹԤ��ޤ���Ͽ���ǥХ�����
- * ����ʥޥ���/�饤��ˤ�Ͽ���ܥ�塼���Ĵ���¾�Υġ����
- * �ԤʤäƲ�������
+ * JuliusはFreeBSDでミキサーデバイスの設定を一切行いません．録音デバイスの
+ * 選択（マイク/ライン）や録音ボリュームの調節は他のツールで
+ * 行なって下さい．
  *
- * �ǥե���ȤΥǥХ���̾�� "/dev/dsp" �Ǥ����Ķ��ѿ� AUDIODEV ��
- * �ǥХ���̾����ꤹ�뤳�Ȥǡ�¾�ΥǥХ���̾����ѤǤ��ޤ���
+ * デフォルトのデバイス名は "/dev/dsp" です．環境変数 AUDIODEV に
+ * デバイス名を指定することで，他のデバイス名を使用できます．
  *
- * ư���ǧ��FreeBSD 3.2-RELEASE �ǹԤʤ��ޤ�����������ɥɥ饤�Ф�
- * snd ����Ѥ��Ƥ��ޤ���
+ * 動作確認はFreeBSD 3.2-RELEASE で行なわれました．サウンドドライバは
+ * snd を使用しています．
  * </JA>
  * <EN>
  * @brief  Microphone input on FreeBSD
@@ -80,7 +80,7 @@ struct pollfd fds[1];		///< Workarea for polling device
 #define POLLINTERVAL 200	///< Polling interval in miliseconds
 
 static char *defaultdev = DEFAULT_DEVICE; ///< Default device name
-static char devname[MAXPATHLEN];		///< Current device name
+static char adevname[MAXPATHLEN];		///< Current device name
 
 /** 
  * Device initialization: check machine capability
@@ -213,18 +213,18 @@ adin_mic_begin(char *pathname)
 {
   /* set device name */
   if (pathname != NULL) {
-    strncpy(devname, pathname, MAXPATHLEN);
-    jlog("Stat: adin_freebsd: device name = %s (from argument)\n", devname);
-  } else if ((p = getenv("AUDIODEV")) != NULL) {
-    strncpy(devname, p, MAXPATHLEN);
-    jlog("Stat: adin_freebsd: device name = %s (from AUDIODEV)\n", devname);
+    strncpy(adevname, pathname, MAXPATHLEN);
+    jlog("Stat: adin_freebsd: device name = %s (from argument)\n", adevname);
+  } else if ((pathname = getenv("AUDIODEV")) != NULL) {
+    strncpy(adevname, pathname, MAXPATHLEN);
+    jlog("Stat: adin_freebsd: device name = %s (from AUDIODEV)\n", adevname);
   } else {
-    strncpy(devname, defaultdev, MAXPATHLEN);
-    jlog("Stat: adin_freebsd: device name = %s (application default)\n", devname);
+    strncpy(adevname, defaultdev, MAXPATHLEN);
+    jlog("Stat: adin_freebsd: device name = %s (application default)\n", adevname);
   }
 
   /* open the device */
-  return(adin_mic_open(devname));
+  return(adin_mic_open(adevname));
 }
 
 /** 
@@ -320,5 +320,5 @@ adin_mic_resume()
 char *
 adin_mic_input_name()
 {
-  return(devname);
+  return(adevname);
 }

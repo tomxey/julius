@@ -2,7 +2,7 @@
  * @file   m_info.c
  * 
  * <JA>
- * @brief  ¥·¥¹¥Æ¥à¾ğÊó¤Î½ĞÎÏ
+ * @brief  ã‚·ã‚¹ãƒ†ãƒ æƒ…å ±ã®å‡ºåŠ›
  * </JA>
  * 
  * <EN>
@@ -29,7 +29,7 @@
  * Output module overview in a global configuration variables to log.
  * </EN>
  * <JA>
- * Á´ÂÎÀßÄê¥Ñ¥é¥á¡¼¥¿Æâ¤Î¥â¥¸¥å¡¼¥ë¹½À®¤Î³µÍ×¤ò¥í¥°¤Ë½ĞÎÏ¤¹¤ë. 
+ * å…¨ä½“è¨­å®šãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿å†…ã®ãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«æ§‹æˆã®æ¦‚è¦ã‚’ãƒ­ã‚°ã«å‡ºåŠ›ã™ã‚‹. 
  * </JA>
  * 
  * @param jconf [in] global configuration variables
@@ -245,7 +245,7 @@ print_mfcc_info(FILE *fp, MFCCCalc *mfcc, Jconf *jconf)
 
 /** 
  * <JA>
- * ¥¨¥ó¥¸¥ó¥¤¥ó¥¹¥¿¥ó¥¹¤ÎÁ´¾ğÊó¤ò¥í¥°¤Ë½ĞÎÏ¤¹¤ë. 
+ * ã‚¨ãƒ³ã‚¸ãƒ³ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã®å…¨æƒ…å ±ã‚’ãƒ­ã‚°ã«å‡ºåŠ›ã™ã‚‹. 
  * </JA>
  * <EN>
  * Output all informations of an engine instance to log.
@@ -947,6 +947,15 @@ print_engine_info(Recog *recog)
       jlog("\t             head margin = %d msec.\n", jconf->detect.head_margin_msec);
       jlog("\t             tail margin = %d msec.\n", jconf->detect.tail_margin_msec);
       jlog("\t              chunk size = %d samples\n", jconf->detect.chunk_size);
+#ifdef HAVE_LIBFVAD
+      if (jconf->detect.fvad_mode < 0) {
+	jlog("\t       FVAD switch value = %d (disabled)\n", jconf->detect.fvad_mode);
+      } else {
+	jlog("\t       FVAD switch value = %d (0: moderate - 3: very aggressive to regist to noise\n", jconf->detect.fvad_mode);
+	jlog("\t    FVAD param smoothlen = %d (%dms)\n", jconf->detect.fvad_smoothnum, jconf->detect.fvad_smoothnum * 10);
+	jlog("\t    FVAD param threshold = %.2f\n", jconf->detect.fvad_thres);
+      }
+#endif /* HAVE_LIBFVAD */
     } else {
       jlog("\t         silence cutting = off\n");
     }

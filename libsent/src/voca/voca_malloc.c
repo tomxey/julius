@@ -2,7 +2,7 @@
  * @file   voca_malloc.c
  * 
  * <JA>
- * @brief  ñ�켭��¤�ΤΥ������դ��Ȳ���
+ * @brief  単語辞書構造体のメモリ割り付けと解放
  * </JA>
  * 
  * <EN>
@@ -43,6 +43,7 @@ word_info_new()
   new->wname = NULL;
   new->woutput = NULL;
   new->wlen = NULL;
+  new->wseq = NULL;
   new->wton = NULL;
 #ifdef CLASS_NGRAM
   new->cprob = NULL;

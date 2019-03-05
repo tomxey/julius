@@ -2,7 +2,7 @@
  * @file   version.c
  * 
  * <JA>
- * @brief  ¥Ğ¡¼¥¸¥ç¥ó¤ª¤è¤Ó¥³¥ó¥Ñ¥¤¥ë»şÀßÄê¤Î½ĞÎÏ
+ * @brief  ãƒãƒ¼ã‚¸ãƒ§ãƒ³ãŠã‚ˆã³ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«æ™‚è¨­å®šã®å‡ºåŠ›
  *
  * </JA>
  * 
@@ -28,9 +28,9 @@
 
 /** 
  * <JA>
- * ¥Ø¥Ã¥À¤ò½ĞÎÏ¤¹¤ë. 
+ * ãƒ˜ãƒƒãƒ€ã‚’å‡ºåŠ›ã™ã‚‹. 
  * 
- * @param strm [in] ½ĞÎÏ¥¹¥È¥ê¡¼¥à
+ * @param strm [in] å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
  * </JA>
  * <EN>
  * Output application header.
@@ -46,9 +46,9 @@ j_put_header(FILE *strm){
 
 /** 
  * <JA>
- * ¥Ğ¡¼¥¸¥ç¥ó¾ğÊó¤ò½ĞÎÏ¤¹¤ë
+ * ãƒãƒ¼ã‚¸ãƒ§ãƒ³æƒ…å ±ã‚’å‡ºåŠ›ã™ã‚‹
  * 
- * @param strm [in] ½ĞÎÏ¥¹¥È¥ê¡¼¥à
+ * @param strm [in] å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
  * </JA>
  * <EN>
  * Output version information.
@@ -61,17 +61,17 @@ j_put_version(FILE *strm){
   if (strm == NULL) return;
   fprintf(strm,"\n%s rev.%s (%s)  built for %s\n\n",
 	  JULIUS_PRODUCTNAME, JULIUS_VERSION, JULIUS_SETUP, JULIUS_HOSTINFO);
-  fprintf(strm,"Copyright (c) 1991-2016 Kawahara Lab., Kyoto University\n");
+  fprintf(strm,"Copyright (c) 1991-2019 Kawahara Lab., Kyoto University\n");
   fprintf(strm,"Copyright (c) 1997-2000 Information-technology Promotion Agency, Japan\n");
   fprintf(strm,"Copyright (c) 2000-2005 Shikano Lab., Nara Institute of Science and Technology\n");
-  fprintf(strm,"Copyright (c) 2005-2016 Julius project team, Nagoya Institute of Technology\n\n");
+  fprintf(strm,"Copyright (c) 2005-2019 Julius project team, Nagoya Institute of Technology\n\n");
 }
 
 /** 
  * <JA>
- * ¥³¥ó¥Ñ¥¤¥ë»ş¤ÎÀßÄê¤ò½ĞÎÏ¤¹¤ë. 
+ * ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«æ™‚ã®è¨­å®šã‚’å‡ºåŠ›ã™ã‚‹. 
  * 
- * @param strm [in] ÆşÎÏ¥¹¥È¥ê¡¼¥à
+ * @param strm [in] å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
  * </JA>
  * <EN>
  * Output compile-time settings.
@@ -236,9 +236,9 @@ j_put_compile_defs(FILE *strm){
 
 /** 
  * <JA>
- * ¥é¥¤¥Ö¥é¥ê¤ÎÀßÄê¤ò½ĞÎÏ¤¹¤ë
+ * ãƒ©ã‚¤ãƒ–ãƒ©ãƒªã®è¨­å®šã‚’å‡ºåŠ›ã™ã‚‹
  * 
- * @param strm [in] ½ĞÎÏ¥¹¥È¥ê¡¼¥à
+ * @param strm [in] å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
  * </JA>
  * <EN>
  * Output library configuration.

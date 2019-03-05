@@ -4,12 +4,12 @@
  * @file   acconfig.h
  * 
  * <JA>
- * @brief  config.h.in ¤ò configure.in ¤«¤éÀ¸À®¤¹¤ë¤¿¤á¤Î autoconf ÍÑ¥Ø¥Ã¥À
+ * @brief  config.h.in ã‚’ configure.in ã‹ã‚‰ç”Ÿæˆã™ã‚‹ãŸã‚ã® autoconf ç”¨ãƒ˜ãƒƒãƒ€
  *
- * ¤³¤Î¥Õ¥¡¥¤¥ë¤Ï¥½¡¼¥¹¤«¤é¥¤¥ó¥¯¥ë¡¼¥É¤µ¤ì¤ë¤³¤È¤Ï¤¢¤ê¤Ş¤»¤ó¡¥
- * ¼Âºİ¤Ë¤Ï¤³¤ÎÆâÍÆ¤Ï config.h.in ¤ËËä¤á¹ş¤Ş¤ì¤Æ¤ª¤ê¡¤
- * configure ¤Ë¤è¤Ã¤Æ config.h.in ¤«¤éÀ¸À®¤µ¤ì¤¿ config.h ¤¬
- * ¥×¥í¥°¥é¥à¤Ë¤è¤Ã¤Æ»ÈÍÑ¤µ¤ì¤Ş¤¹¡¥
+ * ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã¯ã‚½ãƒ¼ã‚¹ã‹ã‚‰ã‚¤ãƒ³ã‚¯ãƒ«ãƒ¼ãƒ‰ã•ã‚Œã‚‹ã“ã¨ã¯ã‚ã‚Šã¾ã›ã‚“ï¼
+ * å®Ÿéš›ã«ã¯ã“ã®å†…å®¹ã¯ config.h.in ã«åŸ‹ã‚è¾¼ã¾ã‚Œã¦ãŠã‚Šï¼Œ
+ * configure ã«ã‚ˆã£ã¦ config.h.in ã‹ã‚‰ç”Ÿæˆã•ã‚ŒãŸ config.h ãŒ
+ * ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«ã‚ˆã£ã¦ä½¿ç”¨ã•ã‚Œã¾ã™ï¼
  *
  * @sa config.h, config.h.in, configure, configure.in
  * </JA>
@@ -37,7 +37,7 @@
 #define JULIUS_PRODUCTNAME "JuliusLib"
 
 /// Version string
-#define JULIUS_VERSION "4.4.2.1"
+#define JULIUS_VERSION "4.5"
 
 /// Engine setting (value of "--enable-setup=...").
 #define JULIUS_SETUP "fast"
@@ -254,3 +254,6 @@
  * 
  */
 #define ENABLE_PLUGIN 1
+
+/* Define if you have libfvad under this dir and enable it */
+#define HAVE_LIBFVAD 1

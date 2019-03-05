@@ -2,7 +2,7 @@
  * @file   main.c
  * 
  * <JA>
- * @brief  Julius/Julian ¥á¥¤¥ó
+ * @brief  Julius/Julian ãƒ¡ã‚¤ãƒ³
  * </JA>
  * 
  * <EN>
@@ -28,6 +28,7 @@
 
 boolean separate_score_flag = FALSE;
 boolean outfile_enabled = FALSE;
+boolean noxmlescape_enabled = FALSE;
 
 static char *logfile = NULL;
 static boolean nolog = FALSE;
@@ -70,6 +71,12 @@ opt_outfile(Jconf *jconf, char *arg[], int argnum)
   outfile_enabled = TRUE;
   return TRUE;
 }
+static boolean
+opt_noxmlescape(Jconf *jconf, char *arg[], int argnum)
+{
+  noxmlescape_enabled = TRUE;
+  return TRUE;
+}
 
 /**********************************************************************/
 int
@@ -98,6 +105,7 @@ main(int argc, char *argv[])
   module_add_option();
   charconv_add_option();
   j_add_option("-separatescore", 0, 0, "output AM and LM scores separately", opt_separatescore);
+  j_add_option("-noxmlescape", 0, 0, "disable XML escape", opt_noxmlescape);
   j_add_option("-logfile", 1, 1, "output log to file", opt_logfile);
   j_add_option("-nolog", 0, 0, "not output any log", opt_nolog);
   j_add_option("-outfile", 0, 0, "save result in separate .out file", opt_outfile);
@@ -212,8 +220,8 @@ main(int argc, char *argv[])
   callback_add(recog, CALLBACK_DEBUG_PASS2_PUSH, visual2_next_word, NULL);
   /* below should be called at result */
   visual2_best(now, winfo);
-  /* ²»À¼¼è¤ê¹þ¤ß¤Ï¥³¡¼¥ë¥Ð¥Ã¥¯¤Ç¿·µ¬ºîÀ® */
-  /* Âè2¥Ñ¥¹¤ÇÇ§¼±·ë²Ì½ÐÎÏ»þ¤Ë°Ê²¼¤ò¼Â¹Ô */
+  /* éŸ³å£°å–ã‚Šè¾¼ã¿ã¯ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã§æ–°è¦ä½œæˆ */
+  /* ç¬¬2ãƒ‘ã‚¹ã§èªè­˜çµæžœå‡ºåŠ›æ™‚ã«ä»¥ä¸‹ã‚’å®Ÿè¡Œ */
   visual2_best(now, recog->model->winfo);
 #endif
   

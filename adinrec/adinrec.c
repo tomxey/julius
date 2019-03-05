@@ -2,7 +2,7 @@
  * @file   adinrec.c
  * 
  * <JA>
- * @brief  ¥Ş¥¤¥¯¤«¤é°ìÈ¯ÏÃ¤ò¥Õ¥¡¥¤¥ë¤Øµ­Ï¿¤¹¤ë
+ * @brief  ãƒã‚¤ã‚¯ã‹ã‚‰ä¸€ç™ºè©±ã‚’ãƒ•ã‚¡ã‚¤ãƒ«ã¸è¨˜éŒ²ã™ã‚‹
  * </JA>
  * 
  * <EN>
@@ -36,7 +36,7 @@ static boolean stout = FALSE;	///< True if output to stdout
 static boolean use_raw = FALSE;	///< Output in RAW format if TRUE
 
 /** 
- * <JA>¥Ø¥ë¥×¤òÉ½¼¨¤·¤Æ½ªÎ»¤¹¤ë</JA>
+ * <JA>ãƒ˜ãƒ«ãƒ—ã‚’è¡¨ç¤ºã—ã¦çµ‚äº†ã™ã‚‹</JA>
  * <EN>Print help and exit</EN>
  */
 static boolean
@@ -52,6 +52,10 @@ opt_help(Jconf *jconf, char *arg[], int argnum)
   fprintf(stderr, "    [-headmargin msec]    head margin length          (%d)\n", jconf->detect.head_margin_msec);
   fprintf(stderr, "    [-tailmargin msec]    tail margin length          (%d)\n", jconf->detect.tail_margin_msec);
   fprintf(stderr, "    [-chunksize sample]   chunk size for processing   (%d)\n", jconf->detect.chunk_size);
+#ifdef HAVE_LIBFVAD
+  fprintf(stderr, "    [-fvad]               FVAD sw (-1=off, 0 - 3)     (%d)\n", jconf->detect.fvad_mode);
+  fprintf(stderr, "    [-fvad_param i f]     FVAD parameter (dur/thres)  (%d %.2f)\n", jconf->detect.fvad_smoothnum, jconf->detect.fvad_thres);
+#endif /* HAVE_LIBFVAD */
   fprintf(stderr, "    [-nostrip]            not strip off zero samples\n");
   fprintf(stderr, "    [-zmean]              remove DC by zero mean\n");
   fprintf(stderr, "    [-nocutsilence]       disable VAD, record all stream\n");
@@ -81,12 +85,12 @@ opt_freq(Jconf *jconf, char *arg[], int argnum)
 
 /** 
  * <JA>
- * Ï¿²»¤µ¤ì¤¿¥µ¥ó¥×¥ëÎó¤ò½èÍı¤¹¤ë¥³¡¼¥ë¥Ğ¥Ã¥¯´Ø¿ô
+ * éŒ²éŸ³ã•ã‚ŒãŸã‚µãƒ³ãƒ—ãƒ«åˆ—ã‚’å‡¦ç†ã™ã‚‹ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°
  * 
- * @param now [in] Ï¿²»¤µ¤ì¤¿¥µ¥ó¥×¥ëÎó
- * @param len [in] Ä¹¤µ¡Ê¥µ¥ó¥×¥ë¿ô¡Ë
+ * @param now [in] éŒ²éŸ³ã•ã‚ŒãŸã‚µãƒ³ãƒ—ãƒ«åˆ—
+ * @param len [in] é•·ã•ï¼ˆã‚µãƒ³ãƒ—ãƒ«æ•°ï¼‰
  * 
- * @return ¥¨¥é¡¼»ş -1¡¤½èÍıÀ®¸ù»ş 0¡¤½èÍıÀ®¸ù¡Ü¶è´Ö½ªÃ¼¸¡½Ğ»ş 1 ¤òÊÖ¤¹¡¥
+ * @return ã‚¨ãƒ©ãƒ¼æ™‚ -1ï¼Œå‡¦ç†æˆåŠŸæ™‚ 0ï¼Œå‡¦ç†æˆåŠŸï¼‹åŒºé–“çµ‚ç«¯æ¤œå‡ºæ™‚ 1 ã‚’è¿”ã™ï¼
  * </JA>
  * <EN>
  * Callback handler of recorded sample fragments
@@ -194,13 +198,13 @@ interrupt_record(int signum)
 
 /** 
  * <JA>
- * ¥á¥¤¥ó´Ø¿ô
+ * ãƒ¡ã‚¤ãƒ³é–¢æ•°
  * 
- * @param argc [in] °ú¿ôÎó¤ÎÄ¹¤µ
- * @param argv [in] °ú¿ôÎó
+ * @param argc [in] å¼•æ•°åˆ—ã®é•·ã•
+ * @param argv [in] å¼•æ•°åˆ—
  * 
  * @return 
- * </JA>¥¨¥é¡¼»ş 1¡¤ÄÌ¾ï½ªÎ»»ş 0 ¤òÊÖ¤¹¡¥
+ * </JA>ã‚¨ãƒ©ãƒ¼æ™‚ 1ï¼Œé€šå¸¸çµ‚äº†æ™‚ 0 ã‚’è¿”ã™ï¼
  * <EN>
  * Main function.
  * 

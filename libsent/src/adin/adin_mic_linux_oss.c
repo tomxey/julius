@@ -2,28 +2,28 @@
  * @file   adin_mic_linux_oss.c
  *
  * <JA>
- * @brief  �ޥ������� (Linux/OSS)
+ * @brief  マイク入力 (Linux/OSS)
  *
- * �ޥ������ϤΤ�������٥�ؿ��Ǥ������󥿥ե������Ȥ��� OSS
- * ������ɥɥ饤�Ф���Ѥ����硤���Υե����뤬���Ѥ���ޤ���
- * �����ͥ�ɸ��Υɥ饤�С�OSS/Linux�Υɥ饤�С������ ALSA ��
- * OSS�ߴ��⡼�ɤ��б����Ƥ��ޤ���
+ * マイク入力のための低レベル関数です．インタフェースとして OSS
+ * サウンドドライバを使用する場合，このファイルが使用されます．
+ * カーネル標準のドライバ，OSS/Linuxのドライバ，および ALSA の
+ * OSS互換モードに対応しています．
  *
- * configure �ǥޥ��������פμ�ưȽ�̤�
- * �Ԥʤ����ʥǥե���ȡˡ�Linux �ǤϤ���OSS�ѥ��󥿥ե����������򤵤�ޤ���
- * ¾�Υ��󥿥ե����� (ALSA, esd, portaudio, spAudio��) ����Ѥ���������
- * configure ���� "--with-mictype=TYPE" ������Ū�˻��ꤷ�Ʋ�������
+ * configure でマイクタイプの自動判別を
+ * 行なう場合（デフォルト），Linux ではこのOSS用インタフェースが選択されます．
+ * 他のインタフェース (ALSA, esd, portaudio, spAudio等) を使用したい場合は
+ * configure 時に "--with-mictype=TYPE" を明示的に指定して下さい．
  *
- * ������ɥ����ɤ� 16bit ��Υ�� ��Ͽ���Ǥ��뤳�Ȥ�ɬ�ܤǤ���
- * ������Linux�Ǥϡ����ƥ쥪Ͽ�������Ǥ��ʤ��ǥХ����ξ�硤
- * �������ͥ�Τߤ����ϤȤ��Ƽ��Ф���ǧ�����뤳�Ȥ�Ǥ��ޤ���
+ * サウンドカードが 16bit モノラル で録音できることが必須です．
+ * ただしLinuxでは，ステレオ録音しかできないデバイスの場合，
+ * 左チャンネルのみを入力として取り出して認識することもできます．
  *
- * Julius��Linux�Ǥϥߥ������ǥХ������������ڹԤ��ޤ���Ͽ���ǥХ�����
- * ����ʥޥ���/�饤��ˤ�Ͽ���ܥ�塼���Ĵ��� xmixer �ʤ�¾�Υġ����
- * �ԤʤäƲ�������
+ * JuliusはLinuxではミキサーデバイスの設定を一切行いません．録音デバイスの
+ * 選択（マイク/ライン）や録音ボリュームの調節は xmixer など他のツールで
+ * 行なって下さい．
  *
- * �ǥե���ȤΥǥХ���̾�� "/dev/dsp" �Ǥ����Ķ��ѿ� AUDIODEV ��
- * �ǥХ���̾����ꤹ�뤳�Ȥǡ�¾�ΥǥХ���̾����ѤǤ��ޤ���
+ * デフォルトのデバイス名は "/dev/dsp" です．環境変数 AUDIODEV に
+ * デバイス名を指定することで，他のデバイス名を使用できます．
  * </JA>
  * <EN>
  * @brief  Microphone input on Linux/OSS
@@ -104,7 +104,7 @@ static boolean need_swap;	///< Whether samples need byte swap
 static int frag_size;		///< Actual data fragment size
 static boolean stereo_rec;	///< TRUE if stereo recording (use left only)
 static char *defaultdev = DEFAULT_DEVICE; ///< Default device name
-static char devname[MAXPATHLEN];		///< Current device name
+static char adevname[MAXPATHLEN];		///< Current device name
 
 /** 
  * Device initialization: check device capability and open for recording.
@@ -363,18 +363,18 @@ adin_oss_begin(char *pathname)
 
   /* set device name */
   if (pathname != NULL) {
-    strncpy(devname, pathname, MAXPATHLEN);
-    jlog("Stat: adin_oss: device name = %s (from argument)\n", devname);
+    strncpy(adevname, pathname, MAXPATHLEN);
+    jlog("Stat: adin_oss: device name = %s (from argument)\n", adevname);
   } else if ((p = getenv("AUDIODEV")) != NULL) {
-    strncpy(devname, p, MAXPATHLEN);
-    jlog("Stat: adin_oss: device name = %s (from AUDIODEV)\n", devname);
+    strncpy(adevname, p, MAXPATHLEN);
+    jlog("Stat: adin_oss: device name = %s (from AUDIODEV)\n", adevname);
   } else {
-    strncpy(devname, defaultdev, MAXPATHLEN);
-    jlog("Stat: adin_oss: device name = %s (application default)\n", devname);
+    strncpy(adevname, defaultdev, MAXPATHLEN);
+    jlog("Stat: adin_oss: device name = %s (application default)\n", adevname);
   }
 
   /* open the device */
-  if (adin_oss_open(devname) == FALSE) return FALSE;
+  if (adin_oss_open(adevname) == FALSE) return FALSE;
 
   /* Read 1 sample (and ignore it) to tell the audio device start recording.
      (If you knows better way, teach me...) */
@@ -488,6 +488,6 @@ adin_oss_input_name()
 #ifndef HAS_OSS
   return NULL;
 #else
-  return(devname);
+  return(adevname);
 #endif
 }

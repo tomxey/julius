@@ -2,21 +2,21 @@
  * @file   recog.h
  * 
  * <JA>
- * @brief  ���󥸥󥤥󥹥��󥹤����
+ * @brief  エンジンインスタンスの定義
  *
- * ǧ�����󥸥�Υ��󥹥��������Ԥ��ޤ������󥹥��󥹤ϡ�
- * Recog ��ȥåץ��󥹥��󥹤Ȥ��ơ����Ѥ��벻����ǥ롤�����ǥ롤
- * �������Ȥ߹�碌��ǧ���������󥹥��󥹤�ʣ�������ޤ���
+ * 認識エンジンのインスタンス定義を行います．インスタンスは，
+ * Recog をトップインスタンスとして，使用する音響モデル，言語モデル，
+ * それらを組み合わせた認識処理インスタンスを複数持ちます．
  *
- * �����Υ��󥹥��󥹤ϡ��б����� jconf ������깽¤�Ρ������
- * ���Ѥ��륵�֥��󥹥��󥹤ؤΥݥ��󥿤�����ޤ���PROCESS_AM �ϲ�����ǥ롤
- * PROCESS_LM �ϸ����ǥ뤴�Ȥ��������ޤ���
+ * 各部のインスタンスは，対応する jconf 内の設定構造体，および
+ * 使用するサブインスタンスへのポインタを持ちます．PROCESS_AM は音響モデル，
+ * PROCESS_LM は言語モデルごとに定義されます．
  *
- * MFCCCalc �ϡ�
- * ������ǥ뤪��� GMM ���׵ᤵ���ѥ�᡼�������פ�Ĵ�٤��Τ���
- * ��������������Τ�ɬ�פʤ�����������ޤ���Ʊ���MFCC�������
- * ����¾�Υե���ȥ���ɽ���������Ĳ�����ǥ뤪���GMM�ɤ����Ǥ�
- * Ʊ�� MFCCCalc ����ͭ����ޤ���
+ * MFCCCalc は，
+ * 音響モデルおよび GMM で要求されるパラメータタイプを調べたのち，
+ * それらを生成するのに必要なだけ生成されます．同一のMFCC型および
+ * その他のフロントエンド処理条件を持つ音響モデルおよびGMMどうしでは
+ * 同じ MFCCCalc が共有されます．
  *
  * </JA>
  * 
@@ -443,6 +443,18 @@ typedef struct __adin__ {
   unsigned int last_trigger_len; // Length of last speech area 
 
   char current_input_name[MAXPATHLEN]; ///< File or device name of current input
+
+#ifdef HAVE_LIBFVAD
+  void *fvad;                     ///< libfvad instance
+  int fvad_frameshiftinms;        ///< parameter: frame shift in ms
+  int fvad_framesize;             ///< parameter: frame size
+  SP16 fvad_speech[MAXSPEECHLEN]; ///< temporal buffer to hold audio input for libfvad
+  int fvad_speechlen;             ///< current length of saved samples
+  int fvad_lastresultnum;         ///< last N
+  int *fvad_lastresult;           ///< working buffer to hold last N results
+  int fvad_lastp;                 ///< current pointer fot lastresult buffer
+  float fvad_thres;               ///< threshold to detect speech
+#endif /* HAVE_LIBFVAD */
 
 } ADIn;
 
