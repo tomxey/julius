@@ -136,3 +136,9 @@ ipch/
 *.vspx
 *.sap
 
+# arch-pkgbuild files
+arch-pkgbuild/pkg/*
+arch-pkgbuild/python-julius-4.4.2.1-3-x86_64.pkg.tar.xz
+arch-pkgbuild/python-julius-repo.tar.gz
+arch-pkgbuild/src/*
+
