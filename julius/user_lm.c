@@ -108,3 +108,8 @@ boolean opt_user_lm_py_location(Jconf *jconf, char *arg[], int argnum)
   strcpy(user_lm_py_location, arg[0]);
   return TRUE;
 }
+
+void free_user_lms()
+{
+  Py_Finalize();
+}

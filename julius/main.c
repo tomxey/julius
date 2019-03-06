@@ -245,6 +245,8 @@ main(int argc, char *argv[])
 
   /* release all */
   j_recog_free(recog);
+  free_user_lms();
+
 
   if (logfile) fclose(fp);
   return(0);
