@@ -160,7 +160,7 @@ main(int argc, char *argv[])
     for(lm=recog->lmlist;lm;lm=lm->next) {
       if (lm->lmtype == LM_PROB) {
   init_user_lms();
-	j_regist_user_lm_func(lm, my_uni, my_bi, my_lm);
+	j_regist_user_lm_func(lm, unigram, bigram, language_model);
       }
     }
   }

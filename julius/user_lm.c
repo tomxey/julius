@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 static char *user_lm_py_location = NULL;
-static PyObject *main_module, *global_dict, *my_uni_py, *my_bi_py, *my_lm_py, *lm_init_py;
+static PyObject *main_module, *global_dict, *unigram_py, *bigram_py, *lm_py, *lm_init_py;
 
 void init_user_lms()
 {
@@ -16,13 +16,8 @@ void init_user_lms()
     wchar_t *program = Py_DecodeLocale(user_lm_py_location, NULL);
     Py_SetProgramName(program);
     
-    // wchar_t **py_argv = (wchar_t **)malloc(sizeof(wchar_t **));
-    // py_argv[0] = program;
-    // PySys_SetArgvEx(1, py_argv, 0);
-    
     Py_Initialize();
     PyRun_SimpleString("import sys; print('Python interpreter up, version: {}'.format(sys.version_info))");
-    // Py_Finalize();
 
     FILE *lm_funs_file = fopen(user_lm_py_location, "r");
     PyRun_SimpleFile(lm_funs_file, user_lm_py_location);
@@ -35,15 +30,15 @@ void init_user_lms()
 
     // Extract a reference to the function "func_name"
     // from the global dictionary
-    my_uni_py = PyDict_GetItemString(global_dict, "my_uni");
-    my_bi_py = PyDict_GetItemString(global_dict, "my_bi");
-    my_lm_py = PyDict_GetItemString(global_dict, "my_lm");
-    lm_init_py = PyDict_GetItemString(global_dict, "lm_init");
+    unigram_py = PyDict_GetItemString(global_dict, "unigram");
+    bigram_py = PyDict_GetItemString(global_dict, "bigram");
+    lm_py = PyDict_GetItemString(global_dict, "language_model");
+    lm_init_py = PyDict_GetItemString(global_dict, "language_model_init");
 
     PyObject *init_status_py = PyObject_CallObject(lm_init_py, NULL);
     if(!PyBool_Check(init_status_py))
     {
-        printf("Did not get bool from lm_init, exiting\n");
+        printf("Did not get bool from language_model_init, exiting\n");
         exit(1);
     }
     
@@ -56,36 +51,33 @@ void init_user_lms()
     }
 }
 
-LOGPROB my_uni(WORD_INFO *winfo, WORD_ID w, LOGPROB ngram_prob){
+LOGPROB unigram(WORD_INFO *winfo, WORD_ID w, LOGPROB ngram_prob){
   // fprintf(stderr, "my_uni call, wordid: %d, logprob: %f\n", w, ngram_prob);
-  PyObject * ret_proba_py = PyObject_CallFunction(my_uni_py, "yif", winfo->woutput[w], w, ngram_prob);
+  PyObject * ret_proba_py = PyObject_CallFunction(unigram_py, "yif", winfo->woutput[w], w, ngram_prob);
   if (!PyFloat_CheckExact(ret_proba_py))
   {
-    printf("Did not get float from my_uni_py, exiting\n");
+    printf("Did not get float from unigram_py, exiting\n");
     exit(1);
   }
   float ret_proba = PyFloat_AS_DOUBLE(ret_proba_py);
-
   // fprintf(stderr, "got %f\n", ret_proba);
   return ret_proba;
 }
 
-LOGPROB my_bi(WORD_INFO *winfo, WORD_ID context, WORD_ID w, LOGPROB ngram_prob){
+LOGPROB bigram(WORD_INFO *winfo, WORD_ID context, WORD_ID w, LOGPROB ngram_prob){
   // fprintf(stderr, "my_bi call, wordid: %d, ncalls: %d, logprob: %f\n", w, my_bi_calls, ngram_prob);
-
-  PyObject * ret_proba_py = PyObject_CallFunction(my_bi_py, "yyiif", winfo->woutput[context], winfo->woutput[w], context, w, ngram_prob);
+  PyObject * ret_proba_py = PyObject_CallFunction(bigram_py, "yyiif", winfo->woutput[context], winfo->woutput[w], context, w, ngram_prob);
   if (!PyFloat_CheckExact(ret_proba_py))
   {
-    printf("Did not get float from my_bi_py, exiting\n");
+    printf("Did not get float from bigram_py, exiting\n");
     exit(1);
   }
   float ret_proba = PyFloat_AS_DOUBLE(ret_proba_py);
-
   // fprintf(stderr, "got %f\n", ret_proba);
   return ret_proba;
 }
 
-LOGPROB my_lm(WORD_INFO *winfo, WORD_ID *contexts, int context_len, WORD_ID w, LOGPROB ngram_prob){
+LOGPROB language_model(WORD_INFO *winfo, WORD_ID *contexts, int context_len, WORD_ID w, LOGPROB ngram_prob){
   
   PyObject *context_ids_py = PyList_New(context_len);
   for(int i=0; i < context_len; ++i)
@@ -99,10 +91,10 @@ LOGPROB my_lm(WORD_INFO *winfo, WORD_ID *contexts, int context_len, WORD_ID w, L
       PyList_SetItem(context_words_py, i, Py_BuildValue("y", winfo->woutput[contexts[i]]));
   }
 
-  PyObject * ret_proba_py = PyObject_CallFunction(my_lm_py, "OOyif", context_ids_py, context_words_py, winfo->woutput[w], w, ngram_prob);
+  PyObject * ret_proba_py = PyObject_CallFunction(lm_py, "OOyif", context_ids_py, context_words_py, winfo->woutput[w], w, ngram_prob);
   if (!PyFloat_CheckExact(ret_proba_py))
   {
-    printf("Did not get float from my_lm_py, exiting\n");
+    printf("Did not get float from language_model_py, exiting\n");
     exit(1);
   }
   float ret_proba = PyFloat_AS_DOUBLE(ret_proba_py);
